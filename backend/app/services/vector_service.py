@@ -29,7 +29,7 @@ def _retry(fn: Callable[[], Any]) -> Any:
 
 
 UPSERT_BATCH = 100
-DELETE_BATCH = 500
+DELETE_BATCH = 100
 
 
 @dataclass(frozen=True)

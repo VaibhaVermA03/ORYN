@@ -34,6 +34,7 @@ class Settings(BaseSettings):
 
     # --- Database --------------------------------------------------------
     database_url: str = "postgresql+psycopg://oryn:oryn@localhost:5432/oryn"
+    migrations_database_url: str | None = None
     db_pool_size: int = 10
     db_max_overflow: int = 10
 
