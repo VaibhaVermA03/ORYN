@@ -1,0 +1,64 @@
+# Local full-stack run:  docker compose up --build
+# Requires: .env (POSTGRES_PASSWORD) and backend/.env (see backend/.env.example).
+name: oryn
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: oryn
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the root .env file}
+      POSTGRES_DB: oryn
+    volumes:
+      - oryn-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oryn -d oryn"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: ./backend
+    command: ["alembic", "upgrade", "head"]
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://oryn:${POSTGRES_PASSWORD}@db:5432/oryn
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg://oryn:${POSTGRES_PASSWORD}@db:5432/oryn
+      STORAGE_DIR: /var/data/storage
+      TEMP_DIR: /var/data/tmp
+      FRONTEND_ORIGINS: http://localhost:5173
+      FRONTEND_POST_LOGIN_URL: http://localhost:5173/app
+      FRONTEND_LOGIN_URL: http://localhost:5173/login
+    ports:
+      - "8000:8000"
+    volumes:
+      - oryn-data:/var/data
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ""   # same-origin: nginx proxies /api to the backend service
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  oryn-pgdata:
+  oryn-data:

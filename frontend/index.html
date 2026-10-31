@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="ORYN: ask questions of your company documents and get answers with traceable citations." />
+    <title>ORYN - Enterprise Knowledge RAG Engine</title>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/KoltavRegular.ttf" as="font" type="font/ttf" crossorigin />
+    <script>
+      // Always set data-theme before first paint (no flash): saved choice, else the OS preference.
+      // Storage can throw (private mode), so it is read in its own try block.
+      (function () {
+        var t = null
+        try {
+          t = localStorage.getItem('oryn-theme')
+        } catch (e) {}
+        if (t !== 'dark' && t !== 'light') {
+          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+        document.documentElement.setAttribute('data-theme', t)
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

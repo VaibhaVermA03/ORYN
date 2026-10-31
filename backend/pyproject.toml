@@ -1,0 +1,24 @@
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "S", "BLE"]
+ignore = [
+  "B008",   # FastAPI Depends()/File()/Query() in defaults is the framework idiom
+  "S101",   # assert is used in tests
+  "S105", "S106",  # token-type constants / test passwords are not secrets
+  "BLE001", # broad excepts are deliberate at provider/worker boundaries and always logged or recorded
+  "E501",   # long lines in tests/prompts; the formatter handles code
+  "UP042", "UP047",  # str-Enum and TypeVar style: kept for SQLAlchemy/enum compatibility and 3.12 readability
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B017", "E402"]
+"app/services/google_service.py" = ["S105"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+check_untyped_defs = true

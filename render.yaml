@@ -1,0 +1,62 @@
+# Render Blueprint for the ORYN backend + PostgreSQL. The frontend is deployed to Vercel (see docs/DEPLOYMENT.md).
+# Note: persistent disks and the preDeployCommand require a paid Render web service plan.
+databases:
+  - name: oryn-db
+    plan: basic-256mb
+    databaseName: oryn
+    user: oryn
+
+services:
+  - type: web
+    name: oryn-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /api/v1/health/live
+    preDeployCommand: alembic upgrade head
+    disk:
+      name: oryn-data
+      mountPath: /var/data
+      sizeGB: 10
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        # Render exposes postgres://...; the app needs the psycopg3 driver scheme, so this value is
+        # set manually in the dashboard (see docs/DEPLOYMENT.md). It is intentionally not auto-linked.
+        sync: false
+      - key: APP_SECRET
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: COOKIE_SAMESITE
+        value: lax
+      - key: COOKIE_DOMAIN
+        sync: false
+      - key: FRONTEND_ORIGINS
+        sync: false
+      - key: FRONTEND_POST_LOGIN_URL
+        sync: false
+      - key: FRONTEND_LOGIN_URL
+        sync: false
+      - key: STORAGE_DIR
+        value: /var/data/storage
+      - key: TEMP_DIR
+        value: /var/data/tmp
+      - key: INGESTION_WORKER_MODE
+        value: inline
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: COHERE_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: BOOTSTRAP_ADMIN_EMAIL
+        sync: false

@@ -1,0 +1,14 @@
+.venv
+__pycache__
+*.pyc
+.env
+.env.*
+!.env.example
+tests
+.test_storage
+.test_tmp
+storage
+tmp
+.pytest_cache
+.ruff_cache
+.mypy_cache
