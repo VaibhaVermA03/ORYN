@@ -1,12 +1,12 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { FullPageSpinner } from '@/components/ui/feedback'
+import { StartupScreen } from '@/components/ui/feedback'
 import { useAuth } from './AuthContext'
 
 /** Route guard. This improves UX only; every API endpoint enforces authorization on the server. */
 export function RequireAuth() {
   const { status } = useAuth()
   const location = useLocation()
-  if (status === 'loading') return <FullPageSpinner label="Checking your session" />
+  if (status === 'loading') return <StartupScreen />
   if (status === 'anonymous') {
     const next = encodeURIComponent(location.pathname + location.search)
     return <Navigate to={`/login?next=${next}`} replace />
@@ -24,7 +24,7 @@ export function RequireAdmin() {
 export function RedirectIfAuthed() {
   const { status } = useAuth()
   const params = new URLSearchParams(useLocation().search)
-  if (status === 'loading') return <FullPageSpinner />
+  if (status === 'loading') return <StartupScreen />
   if (status === 'authenticated') return <Navigate to={safeNext(params.get('next'))} replace />
   return <Outlet />
 }

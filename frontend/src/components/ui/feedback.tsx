@@ -1,5 +1,6 @@
 import { AlertTriangle, CheckCircle2, Info, Loader2 } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Logo } from '@/components/Logo'
 import { cn } from '@/lib/utils'
 
 export function Spinner({ className, label }: { className?: string; label?: string }) {
@@ -96,6 +97,40 @@ export function FullPageSpinner({ label = 'Loading' }: { label?: string }) {
   return (
     <div className="flex h-full min-h-screen items-center justify-center text-muted">
       <Spinner className="h-6 w-6" label={label} />
+    </div>
+  )
+}
+
+/** How long the app waits before explaining a slow start. A warm server answers well before this. */
+export const SLOW_START_NOTICE_MS = 2500
+
+/**
+ * Full-page screen shown while the app checks the session. The backend runs on Render's free plan, which
+ * puts the server to sleep when idle, so the first request after a quiet period can take about a minute.
+ * If the wait goes past SLOW_START_NOTICE_MS, a short explanation fades in so people know it is not broken.
+ */
+export function StartupScreen({ label = 'Checking your session' }: { label?: string }) {
+  const [slow, setSlow] = useState(false)
+  useEffect(() => {
+    const t = window.setTimeout(() => setSlow(true), SLOW_START_NOTICE_MS)
+    return () => window.clearTimeout(t)
+  }, [])
+
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-app px-6 text-center text-ink">
+      <Logo />
+      <Spinner className="h-6 w-6 text-accent-fg" label={label} />
+      <div aria-live="polite" className="min-h-28 max-w-sm">
+        {slow && (
+          <div className="animate-[oryn-rise_0.4s_ease-out] rounded-xl border border-line bg-surface px-4 py-3 text-left shadow-card">
+            <p className="text-sm font-semibold">Waking up the server&hellip;</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-muted">
+              This project is deployed on Render&rsquo;s free plan, which puts the server to sleep when it is idle. The first load can
+              take up to a minute. After that, everything is fast. Thanks for your patience!
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
