@@ -390,7 +390,7 @@ export function AssistantPage() {
               onKeyDown={onKey}
               rows={1}
               maxLength={4000}
-              placeholder="Ask a question about your documents"
+              placeholder="Ask something..."
               className="max-h-40 min-h-10 flex-1 resize-none rounded-lg border border-line bg-surface px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-accent-fg"
             />
             {streaming ? (
